@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "Amazon Country of Origin",
+    "version": "1.0.0",
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.amazon.com/*"
+            ],
+            "js": [
+                "script.js"
+            ]
+        }
+    ]
+}
