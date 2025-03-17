@@ -5,6 +5,8 @@ const loadingText = "Loading...";
 const asinRegex = /\/dp\/([A-Z0-9]{10})/;
 const madeInRegex = /made in (the )?([A-Za-z]+)/i;
 
+const processedItems = new Set();
+
 function updateTitle(element, country) {
   if (!element) {
     return;
@@ -65,11 +67,16 @@ function getMadeInCountry(text) {
     return null;
   }
   const madeIn = country[2];
-  if (madeIn.length < 2){
+  if (madeIn.length < 2) {
     return null;
   }
 
-  return madeIn;
+  // Don't consider it a country if it starts with a lowercase letter
+  if (madeIn[0] === madeIn[0].toUpperCase()) {
+    return madeIn;
+  }
+
+  return null;
 }
 
 function getCountryOfOrigin(doc) {
@@ -112,6 +119,12 @@ function processProductList() {
       return;
     }
 
+    if (processedItems.has(asin)) {
+      return;
+    }
+
+    processedItems.add(asin);
+
     const saved = loadCountryFromStorage(asin);
 
     if (!saved) {
@@ -146,6 +159,12 @@ function processProductPage() {
     return;
   }
 
+  if (processedItems.has(asin)) {
+    return;
+  }
+
+  processedItems.add(asin);
+
   const saved = loadCountryFromStorage(asin);
   if (saved) {
     updateTitle(document.querySelector("span#productTitle"), saved);
@@ -165,11 +184,12 @@ function processProductPage() {
 let lastUrl = null;
 setInterval(() => {
   if (lastUrl !== window.location.href) {
+    processedItems.clear();
     lastUrl = window.location.href;
-    if (lastUrl.includes("/dp/")) {
-      processProductPage();
-    } else {
-      processProductList();
-    }
+  }
+  if (lastUrl.includes("/dp/")) {
+    processProductPage();
+  } else {
+    processProductList();
   }
 }, 200);
