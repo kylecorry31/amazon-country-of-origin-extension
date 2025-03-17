@@ -3,7 +3,7 @@ const entriesSelector = ".prodDetSectionEntry";
 const alternativeEntriesSelector = ".a-text-bold";
 const loadingText = "Loading...";
 const asinRegex = /\/dp\/([A-Z0-9]{10})/;
-const madeInRegex = /made in (the )?([A-Za-z ,]+)/i;
+const madeInRegex = /made in (the )?([A-Za-z]+)/i;
 
 function updateTitle(element, country) {
   if (!element) {
@@ -64,7 +64,12 @@ function getMadeInCountry(text) {
   if (!country) {
     return null;
   }
-  return country[2];
+  const madeIn = country[2];
+  if (madeIn.length < 2){
+    return null;
+  }
+
+  return madeIn;
 }
 
 function getCountryOfOrigin(doc) {
